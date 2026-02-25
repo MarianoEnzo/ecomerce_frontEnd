@@ -1,8 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
+:root {
+  --background: #F5F0EA;
+  --foreground: #111111;
+  --card: #EDE8DF;
+  --muted: #D4C5B0;
+  --muted-foreground: #888888;
+  --border: #D4C5B0;
+}
 
 * {
   margin: 0;
@@ -10,9 +20,18 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background-color: #111111;
-  color: #FAFAFA;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+  font-family: 'DM Serif Display', Georgia, serif;
 }

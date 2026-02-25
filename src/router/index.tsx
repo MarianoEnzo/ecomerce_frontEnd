@@ -14,6 +14,7 @@ import CatalogPage from '../pages/public/CatalogPage';
 import ProductDetailPage from '../pages/public/ProducDetailPage';
 import CartPage from '../pages/public/CartPage';
 import CheckoutPage from '../pages/public/CheckoutPage';
+import OrderDetailPage from '../pages/OrderDetailPage';
 
 // Pages — Auth
 import LoginPage from '../pages/auth/LoginPage';
@@ -21,7 +22,6 @@ import RegisterPage from '../pages/auth/RegisterPage';
 
 // Pages — Authenticated
 import MyOrdersPage from '../pages/MyOrdersPage';
-import OrderDetailPage from '../pages/OrderDetailPage';
 
 // Pages — Admin
 import AdminProductsPage from '../pages/admin/AdminProductsPage';
@@ -40,6 +40,7 @@ const router = createBrowserRouter([
       { path: 'products/:id', element: <ProductDetailPage /> },
       { path: 'cart', element: <CartPage /> },
       { path: 'checkout', element: <CheckoutPage /> },
+      { path: 'orders/:id', element: <OrderDetailPage /> }, // pública — guest y logueado
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
 
@@ -47,8 +48,7 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          { path: 'my-orders', element: <MyOrdersPage /> },
-          { path: 'my-orders/:id', element: <OrderDetailPage /> },
+          { path: 'my-orders', element: <MyOrdersPage /> }, // historial — solo logueados
         ],
       },
     ],
