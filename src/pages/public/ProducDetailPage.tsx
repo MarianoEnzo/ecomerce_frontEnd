@@ -1,14 +1,17 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Minus, Plus } from 'lucide-react';
-import { productsApi } from '../../features/auth/products/product.api';
-import { cartApi } from '../../features/cart/cart.api';
-import { useCartStore } from '../../store/cart.store';
-import { formatPrice } from '../../lib/utils';
-import type { ProductVariant } from '../../types';
+import { useState, useMemo, useEffect, useLayoutEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Minus, Plus } from "lucide-react";
+import { productsApi } from "../../features/auth/products/product.api";
+import { cartApi } from "../../features/cart/cart.api";
+import { useCartStore } from "../../store/cart.store";
+import { formatPrice } from "../../lib/utils";
+import type { ProductVariant } from "../../types";
 
 export default function ProductDetailPage() {
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { setCart, openCart } = useCartStore();
@@ -17,58 +20,70 @@ export default function ProductDetailPage() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const { data: product, isLoading, isError } = useQuery({
-    queryKey: ['product', id],
+  const {
+    data: product,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["product", id],
     queryFn: () => productsApi.getOne(Number(id)),
     enabled: !!id,
   });
 
-    useEffect(() => {
-  if (product && product.variants.length > 0) {
-    setSelectedColor(product.variants[0].colorId);
-  }
-}, [product]);
+  useEffect(() => {
+    if (product && product.variants.length > 0) {
+      setSelectedColor(product.variants[0].colorId);
+    }
+  }, [product]);
 
   // Colores únicos disponibles
   const colors = useMemo(() => {
     if (!product) return [];
     const seen = new Set<number>();
-    return product.variants.reduce<{ id: number; name: string; hexCode: string; imageUrl: string | null }[]>(
-      (acc, v) => {
-        if (!seen.has(v.colorId)) {
-          seen.add(v.colorId);
-          acc.push({ id: v.colorId, name: v.color.name, hexCode: v.color.hexCode, imageUrl: v.imageUrl });
-        }
-        return acc;
-      },
-      []
-    );
+    return product.variants.reduce<
+      { id: number; name: string; hexCode: string; imageUrl: string | null }[]
+    >((acc, v) => {
+      if (!seen.has(v.colorId)) {
+        seen.add(v.colorId);
+        acc.push({
+          id: v.colorId,
+          name: v.color.name,
+          hexCode: v.color.hexCode,
+          imageUrl: v.imageUrl,
+        });
+      }
+      return acc;
+    }, []);
   }, [product]);
 
   // Talles disponibles para el color seleccionado
   const availableSizes = useMemo(() => {
     if (!product) return [];
     return product.variants.filter(
-      (v) => !selectedColor || v.colorId === selectedColor
+      (v) => !selectedColor || v.colorId === selectedColor,
     );
   }, [product, selectedColor]);
 
   // Variante seleccionada actualmente
   const selectedVariant = useMemo<ProductVariant | null>(() => {
     if (!product || !selectedSize) return null;
-    return product.variants.find(
-      (v) =>
-        v.size === selectedSize &&
-        (!selectedColor || v.colorId === selectedColor)
-    ) ?? null;
+    return (
+      product.variants.find(
+        (v) =>
+          v.size === selectedSize &&
+          (!selectedColor || v.colorId === selectedColor),
+      ) ?? null
+    );
   }, [product, selectedSize, selectedColor]);
 
   // Imagen activa — la del color seleccionado o la primera disponible
   const activeImage = useMemo(() => {
     if (selectedColor) {
-      const colorVariant = product?.variants.find((v) => v.colorId === selectedColor);
+      const colorVariant = product?.variants.find(
+        (v) => v.colorId === selectedColor,
+      );
       if (colorVariant?.imageUrl) return colorVariant.imageUrl;
     }
     const firstWithImage = product?.variants.find((v) => v.imageUrl);
@@ -77,14 +92,14 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!selectedVariant) {
-      setError('Please select a size');
+      setError("Please select a size");
       return;
     }
     if (selectedVariant.stock < quantity) {
       setError(`Only ${selectedVariant.stock} units available`);
       return;
     }
-    setError('');
+    setError("");
     setAdding(true);
     try {
       await cartApi.addItem(selectedVariant.id, quantity);
@@ -92,7 +107,7 @@ export default function ProductDetailPage() {
       setCart(cart);
       openCart();
     } catch {
-      setError('Could not add to cart. Try again.');
+      setError("Could not add to cart. Try again.");
     } finally {
       setAdding(false);
     }
@@ -122,7 +137,7 @@ export default function ProductDetailPage() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <p className="text-sm text-muted-foreground">Product not found.</p>
         <button
-          onClick={() => navigate('/catalog')}
+          onClick={() => navigate("/catalog")}
           className="mt-4 text-xs uppercase tracking-widest text-foreground underline"
         >
           Back to Catalog
@@ -134,25 +149,35 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-background pt-16">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-
         {/* Breadcrumb */}
         <nav className="mb-8 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
-          <button onClick={() => navigate('/')} className="hover:text-foreground transition-colors">Home</button>
+          <button
+            onClick={() => navigate("/")}
+            className="hover:text-foreground transition-colors"
+          >
+            Home
+          </button>
           <span>/</span>
-          <button onClick={() => navigate('/catalog')} className="hover:text-foreground transition-colors">Catalog</button>
+          <button
+            onClick={() => navigate("/catalog")}
+            className="hover:text-foreground transition-colors"
+          >
+            Catalog
+          </button>
           <span>/</span>
           <span className="text-foreground">{product.name}</span>
         </nav>
 
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-
           {/* Imagen */}
           <div className="aspect-[3/4] overflow-hidden bg-card">
             {activeImage ? (
               <img
                 src={activeImage}
                 alt={product.name}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-opacity duration-700"
+                style={{ opacity: 0 }}
+                onLoad={(e) => (e.currentTarget.style.opacity = "1")}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-card">
@@ -163,11 +188,11 @@ export default function ProductDetailPage() {
 
           {/* Info + Selector */}
           <div className="flex flex-col gap-8 lg:pt-4">
-
             {/* Nombre y precio */}
             <div className="flex flex-col gap-2">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                {product.category.toLowerCase()} · {product.gender.toLowerCase()}
+                {product.category.toLowerCase()} ·{" "}
+                {product.gender.toLowerCase()}
               </span>
               <h1 className="font-serif text-3xl text-foreground lg:text-4xl">
                 {product.name}
@@ -188,7 +213,10 @@ export default function ProductDetailPage() {
             {colors.length > 0 && (
               <div className="flex flex-col gap-3">
                 <span className="text-xs uppercase tracking-widest text-foreground">
-                  Color{selectedColor ? `: ${colors.find(c => c.id === selectedColor)?.name}` : ''}
+                  Color
+                  {selectedColor
+                    ? `: ${colors.find((c) => c.id === selectedColor)?.name}`
+                    : ""}
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {colors.map((color) => (
@@ -197,13 +225,13 @@ export default function ProductDetailPage() {
                       onClick={() => {
                         setSelectedColor(color.id);
                         setSelectedSize(null);
-                        setError('');
+                        setError("");
                       }}
                       title={color.name}
                       className={`relative h-14 w-14 overflow-hidden border-2 transition-all ${
                         selectedColor === color.id
-                          ? 'border-foreground'
-                          : 'border-transparent hover:border-muted'
+                          ? "border-foreground"
+                          : "border-transparent hover:border-muted"
                       }`}
                     >
                       {color.imageUrl ? (
@@ -227,7 +255,7 @@ export default function ProductDetailPage() {
             {/* Talle */}
             <div className="flex flex-col gap-3">
               <span className="text-xs uppercase tracking-widest text-foreground">
-                Size{selectedSize ? `: ${selectedSize}` : ''}
+                Size{selectedSize ? `: ${selectedSize}` : ""}
               </span>
               <div className="flex flex-wrap gap-2">
                 {availableSizes.map((variant) => {
@@ -239,16 +267,16 @@ export default function ProductDetailPage() {
                       onClick={() => {
                         if (!outOfStock) {
                           setSelectedSize(variant.size);
-                          setError('');
+                          setError("");
                         }
                       }}
                       disabled={outOfStock}
                       className={`h-10 min-w-[48px] px-3 text-xs uppercase tracking-wider transition-colors ${
                         selected
-                          ? 'bg-foreground text-background'
+                          ? "bg-foreground text-background"
                           : outOfStock
-                          ? 'border border-border text-muted-foreground/40 line-through cursor-not-allowed'
-                          : 'border border-border text-foreground hover:bg-foreground hover:text-background'
+                            ? "border border-border text-muted-foreground/40 line-through cursor-not-allowed"
+                            : "border border-border text-foreground hover:bg-foreground hover:text-background"
                       }`}
                     >
                       {variant.size}
@@ -277,7 +305,7 @@ export default function ProductDetailPage() {
                   <button
                     onClick={() =>
                       setQuantity((q) =>
-                        Math.min(selectedVariant?.stock ?? 99, q + 1)
+                        Math.min(selectedVariant?.stock ?? 99, q + 1),
                       )
                     }
                     className="flex h-10 w-10 items-center justify-center text-foreground transition-colors hover:bg-foreground hover:text-background"
@@ -295,9 +323,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Error */}
-            {error && (
-              <p className="text-[11px] text-red-500">{error}</p>
-            )}
+            {error && <p className="text-[11px] text-red-500">{error}</p>}
 
             {/* Add to cart */}
             <button
@@ -305,9 +331,8 @@ export default function ProductDetailPage() {
               disabled={adding}
               className="w-full bg-foreground py-4 text-xs uppercase tracking-widest text-background transition-opacity hover:opacity-75 disabled:opacity-50"
             >
-              {adding ? 'Adding...' : 'Add to Cart'}
+              {adding ? "Adding..." : "Add to Cart"}
             </button>
-
           </div>
         </div>
       </div>

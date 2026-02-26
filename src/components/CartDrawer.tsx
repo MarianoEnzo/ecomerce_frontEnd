@@ -1,22 +1,27 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { X, Minus, Plus, Trash2 } from 'lucide-react';
-import { useCartStore } from '../store/cart.store';
-import { cartApi } from '../features/cart/cart.api';
-import { formatPrice } from '../lib/utils';
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { X, Minus, Plus, Trash2 } from "lucide-react";
+import { useCartStore } from "../store/cart.store";
+import { cartApi } from "../features/cart/cart.api";
+import { formatPrice } from "../lib/utils";
 
 export default function CartDrawer() {
   const { cart, isOpen, closeCart, setCart } = useCartStore();
 
   // Cargar el carrito al montar
   useEffect(() => {
-    cartApi.getCart().then(setCart).catch(() => {});
+    cartApi
+      .getCart()
+      .then(setCart)
+      .catch(() => {});
   }, []);
 
   // Bloquear scroll del body cuando está abierto
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
   const handleUpdateItem = async (itemId: number, quantity: number) => {
@@ -44,7 +49,7 @@ export default function CartDrawer() {
   };
 
   const items = cart?.items ?? [];
-  const total = cart?.total ?? '0';
+  const total = cart?.total ?? "0";
 
   return (
     <>
@@ -59,14 +64,18 @@ export default function CartDrawer() {
       {/* Drawer */}
       <div
         className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-sm flex-col bg-background transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <span className="text-xs uppercase tracking-widest text-foreground">
+          <Link
+            to="/cart"
+            onClick={closeCart}
+            className="text-xs uppercase tracking-widest text-foreground hover:opacity-60 transition-opacity"
+          >
             Cart {items.length > 0 && `(${items.length})`}
-          </span>
+          </Link>
           <button
             onClick={closeCart}
             className="text-foreground transition-colors hover:text-muted-foreground"
@@ -76,10 +85,14 @@ export default function CartDrawer() {
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div
+          className={`flex-1 px-6 py-4 ${isOpen ? "overflow-y-auto" : "overflow-hidden"}`}
+        >
           {items.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-              <p className="text-sm text-muted-foreground">Your cart is empty</p>
+              <p className="text-sm text-muted-foreground">
+                Your cart is empty
+              </p>
               <button
                 onClick={closeCart}
                 className="text-xs uppercase tracking-widest text-foreground underline underline-offset-2"
@@ -100,7 +113,9 @@ export default function CartDrawer() {
                         <img
                           src={variant.imageUrl}
                           alt={product.name}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-cover transition-opacity duration-500"
+                          style={{ opacity: 0 }}
+                          onLoad={(e) => (e.currentTarget.style.opacity = "1")}
                         />
                       ) : (
                         <div className="h-full w-full bg-card" />
@@ -111,7 +126,9 @@ export default function CartDrawer() {
                     <div className="flex flex-1 flex-col gap-1">
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-sm text-foreground">{product.name}</p>
+                          <p className="text-sm text-foreground">
+                            {product.name}
+                          </p>
                           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
                             {variant.color.name} · {variant.size}
                           </p>
@@ -146,7 +163,9 @@ export default function CartDrawer() {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => handleUpdateItem(item.id, item.quantity + 1)}
+                          onClick={() =>
+                            handleUpdateItem(item.id, item.quantity + 1)
+                          }
                           className="flex h-7 w-7 items-center justify-center text-foreground transition-colors hover:bg-foreground hover:text-background"
                         >
                           <Plus className="h-3 w-3" strokeWidth={1.5} />
@@ -164,8 +183,12 @@ export default function CartDrawer() {
         {items.length > 0 && (
           <div className="border-t border-border px-6 py-6 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase tracking-widest text-muted-foreground">Total</span>
-              <span className="text-sm text-foreground">{formatPrice(total)}</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                Total
+              </span>
+              <span className="text-sm text-foreground">
+                {formatPrice(total)}
+              </span>
             </div>
 
             <Link
