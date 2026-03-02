@@ -53,7 +53,7 @@ export default function FeaturedProducts() {
                 </Link>
                 <button
                   onClick={() => setQuickAdd(product)}
-                  className="absolute bottom-0 left-0 right-0 translate-y-full bg-foreground py-3 text-center text-xs uppercase tracking-widest text-background transition-transform duration-300 group-hover:translate-y-0"
+                  className="absolute bottom-0 left-0 right-0 translate-y-full bg-accent py-3 text-center text-xs uppercase tracking-widest text-white transition-transform duration-300 group-hover:translate-y-0"
                 >
                   Quick Add
                 </button>
@@ -80,7 +80,7 @@ export default function FeaturedProducts() {
         <div className="mt-12 text-center">
           <Link
             to="/catalog"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-foreground border-b border-foreground pb-0.5 transition-opacity hover:opacity-60"
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent border-b border-accent pb-0.5 transition-opacity hover:opacity-60"
           >
             View All
           </Link>

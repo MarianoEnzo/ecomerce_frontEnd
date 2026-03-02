@@ -86,7 +86,7 @@ export default function ProductCard({
                 state={{ colorId: color.id }}
                 className={`h-8 w-8 overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
                   i === activeColorIndex
-                    ? "border-foreground"
+                    ? "border-accent"
                     : "border-transparent hover:border-foreground/40"
                 }`}
                 title={color.name}

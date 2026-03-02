@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
 
 const VIDEO_URL =
-  "https://videos.pexels.com/video-files/3777382/3777382-uhd_2560_1440_25fps.mp4";
+  "https://media.istockphoto.com/id/1450642470/video/fitness-city-and-man-running-on-bridge-training-in-a-cardio-exercise-or-workout-for-a-sports.mp4?s=mp4-640x640-is&k=20&c=N6XYqvxVKmGXGYIvOGXTVpf_oPku7owT0DKRYjUgz8E=";
 
 export default function EditorialBanner() {
   const videoRef = useRef<HTMLVideoElement>(null);

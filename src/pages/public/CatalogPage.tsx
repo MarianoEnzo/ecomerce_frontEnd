@@ -152,7 +152,7 @@ export default function CatalogPage() {
                     filters.category === cat.value ? undefined : cat.value,
                   )
                 }
-                className={`text-xs transition-colors ${filters.category === cat.value ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`text-xs transition-colors ${filters.category === cat.value ? "text-accent" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {filters.category === cat.value ? "— " : ""}
                 {cat.label}
@@ -173,7 +173,7 @@ export default function CatalogPage() {
                     filters.gender === g.value ? undefined : g.value,
                   )
                 }
-                className={`text-xs transition-colors ${filters.gender === g.value ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                className={`text-xs transition-colors ${filters.gender === g.value ? "text-accent" : "text-muted-foreground hover:text-foreground"}`}
               >
                 {filters.gender === g.value ? "— " : ""}
                 {g.label}
