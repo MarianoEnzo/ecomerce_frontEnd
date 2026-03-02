@@ -1,10 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-background px-6 pt-24 pb-12 lg:px-8 lg:pt-32 lg:pb-20 overflow-hidden">
+    <section className="relative bg-background px-6 lg:px-8 overflow-hidden min-h-screen flex items-center">
       <div className="mx-auto grid max-w-7xl items-center lg:grid-cols-2">
-
         {/* Left Content */}
         <div className="relative z-10 flex flex-col gap-6 lg:gap-8">
           {/* Número editorial de fondo */}
@@ -22,13 +21,13 @@ export default function HeroSection() {
           </h1>
 
           <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-            Minimalist streetwear for those who move in silence.
-            Elevated basics designed with intention.
+            Minimalist streetwear for those who move in silence. Elevated basics
+            designed with intention.
           </p>
 
           <Link
             to="/catalog"
-            className="inline-flex w-fit items-center bg-foreground px-8 py-3.5 text-xs uppercase tracking-wider text-background transition-opacity hover:opacity-75"
+            className="inline-flex w-fit items-center bg-accent text-white px-8 py-3.5 text-xs uppercase tracking-wider text-background transition-opacity hover:opacity-75"
           >
             Shop Now
           </Link>
@@ -44,7 +43,6 @@ export default function HeroSection() {
             />
           </div>
         </div>
-
       </div>
     </section>
   );

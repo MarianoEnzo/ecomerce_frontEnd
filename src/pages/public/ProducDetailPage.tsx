@@ -1,26 +1,102 @@
 import { useState, useMemo, useEffect, useLayoutEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 import { productsApi } from "../../features/auth/products/product.api";
 import { cartApi } from "../../features/cart/cart.api";
 import { useCartStore } from "../../store/cart.store";
 import { formatPrice } from "../../lib/utils";
 import type { ProductVariant } from "../../types";
 
+const SIZE_GUIDE = [
+  { us: "XS", uk: "6", chest: "32-34", waist: "24-26" },
+  { us: "S", uk: "8", chest: "34-36", waist: "26-28" },
+  { us: "M", uk: "10", chest: "36-38", waist: "28-30" },
+  { us: "L", uk: "12", chest: "38-40", waist: "30-32" },
+  { us: "XL", uk: "14", chest: "40-42", waist: "32-34" },
+  { us: "XXL", uk: "16", chest: "42-44", waist: "34-36" },
+];
+
+function SizeGuideModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md bg-background border border-border p-6 sm:p-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <span className="text-xs uppercase tracking-widest text-foreground">
+            Size Guide
+          </span>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+        </div>
+
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="pb-3 text-left uppercase tracking-widest text-muted-foreground font-normal">
+                US
+              </th>
+              <th className="pb-3 text-left uppercase tracking-widest text-muted-foreground font-normal">
+                UK
+              </th>
+              <th className="pb-3 text-left uppercase tracking-widest text-muted-foreground font-normal">
+                Chest (in)
+              </th>
+              <th className="pb-3 text-left uppercase tracking-widest text-muted-foreground font-normal">
+                Waist (in)
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {SIZE_GUIDE.map((row, i) => (
+              <tr
+                key={row.us}
+                className={`border-b border-border/50 ${i % 2 === 0 ? "" : "bg-muted/30"}`}
+              >
+                <td className="py-3 text-foreground font-medium">{row.us}</td>
+                <td className="py-3 text-foreground">{row.uk}</td>
+                <td className="py-3 text-muted-foreground">{row.chest}</td>
+                <td className="py-3 text-muted-foreground">{row.waist}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <p className="mt-6 text-[10px] text-muted-foreground leading-relaxed">
+          Measurements are in inches. If you're between sizes, we recommend
+          sizing up.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductDetailPage() {
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { setCart, openCart } = useCartStore();
+  const location = useLocation();
+  const preselectedColorId = location.state?.colorId;
 
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
   const {
     data: product,
@@ -34,11 +110,10 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (product && product.variants.length > 0) {
-      setSelectedColor(product.variants[0].colorId);
+      setSelectedColor(preselectedColorId ?? product.variants[0].colorId);
     }
   }, [product]);
 
-  // Colores únicos disponibles
   const colors = useMemo(() => {
     if (!product) return [];
     const seen = new Set<number>();
@@ -58,7 +133,6 @@ export default function ProductDetailPage() {
     }, []);
   }, [product]);
 
-  // Talles disponibles para el color seleccionado
   const availableSizes = useMemo(() => {
     if (!product) return [];
     return product.variants.filter(
@@ -66,7 +140,6 @@ export default function ProductDetailPage() {
     );
   }, [product, selectedColor]);
 
-  // Variante seleccionada actualmente
   const selectedVariant = useMemo<ProductVariant | null>(() => {
     if (!product || !selectedSize) return null;
     return (
@@ -78,7 +151,6 @@ export default function ProductDetailPage() {
     );
   }, [product, selectedSize, selectedColor]);
 
-  // Imagen activa — la del color seleccionado o la primera disponible
   const activeImage = useMemo(() => {
     if (selectedColor) {
       const colorVariant = product?.variants.find(
@@ -113,7 +185,6 @@ export default function ProductDetailPage() {
     }
   };
 
-  // ─── Loading ───────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background pt-16">
@@ -131,7 +202,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // ─── Error ─────────────────────────────────────────────────────────────────
   if (isError || !product) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
@@ -148,8 +218,11 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-background pt-16">
+      {sizeGuideOpen && (
+        <SizeGuideModal onClose={() => setSizeGuideOpen(false)} />
+      )}
+
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        {/* Breadcrumb */}
         <nav className="mb-8 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
           <button
             onClick={() => navigate("/")}
@@ -169,7 +242,6 @@ export default function ProductDetailPage() {
         </nav>
 
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Imagen */}
           <div className="aspect-[3/4] overflow-hidden bg-card">
             {activeImage ? (
               <img
@@ -186,9 +258,7 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          {/* Info + Selector */}
           <div className="flex flex-col gap-8 lg:pt-4">
-            {/* Nombre y precio */}
             <div className="flex flex-col gap-2">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
                 {product.category.toLowerCase()} ·{" "}
@@ -202,14 +272,12 @@ export default function ProductDetailPage() {
               </p>
             </div>
 
-            {/* Descripción */}
             {product.description && (
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {product.description}
               </p>
             )}
 
-            {/* Color */}
             {colors.length > 0 && (
               <div className="flex flex-col gap-3">
                 <span className="text-xs uppercase tracking-widest text-foreground">
@@ -252,11 +320,18 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Talle */}
             <div className="flex flex-col gap-3">
-              <span className="text-xs uppercase tracking-widest text-foreground">
-                Size{selectedSize ? `: ${selectedSize}` : ""}
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-xs uppercase tracking-widest text-foreground">
+                  Size{selectedSize ? `: ${selectedSize}` : ""}
+                </span>
+                <button
+                  onClick={() => setSizeGuideOpen(true)}
+                  className="text-[10px] uppercase tracking-widest text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
+                >
+                  Size Guide
+                </button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {availableSizes.map((variant) => {
                   const outOfStock = variant.stock === 0;
@@ -286,7 +361,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Cantidad */}
             <div className="flex flex-col gap-3">
               <span className="text-xs uppercase tracking-widest text-foreground">
                 Quantity
@@ -322,10 +396,8 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Error */}
             {error && <p className="text-[11px] text-red-500">{error}</p>}
 
-            {/* Add to cart */}
             <button
               onClick={handleAddToCart}
               disabled={adding}

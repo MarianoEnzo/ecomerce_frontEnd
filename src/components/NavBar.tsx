@@ -1,66 +1,150 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, User, ShoppingBag, Menu, X, Package, LogOut } from 'lucide-react';
-import { useAuthStore } from '../store/auth.store';
-import { useCartStore } from '../store/cart.store';
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Search,
+  User,
+  ShoppingBag,
+  Menu,
+  X,
+  Package,
+  LogOut,
+  ChevronDown,
+} from "lucide-react";
+import { useAuthStore } from "../store/auth.store";
+import { useCartStore } from "../store/cart.store";
 
-const navLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'Catalog', href: '/catalog' },
-  { label: 'Men', href: '/catalog?gender=MALE' },
-  { label: 'Women', href: '/catalog?gender=FEMALE' },
+const GENDER_LINKS = [
+  { label: "Men", href: "/catalog?gender=MALE" },
+  { label: "Women", href: "/catalog?gender=FEMALE" },
+  { label: "Unisex", href: "/catalog?gender=UNISEX" },
+];
+
+const CATEGORY_LINKS = [
+  { label: "All", href: "/catalog" },
+  { label: "T-Shirts", href: "/catalog?category=TSHIRT" },
+  { label: "Sweatshirts", href: "/catalog?category=SWEATSHIRT" },
+  { label: "Jackets", href: "/catalog?category=JACKET" },
+  { label: "Pants", href: "/catalog?category=PANTS" },
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuthStore();
   const { toggleCart, itemCount } = useCartStore();
   const navigate = useNavigate();
   const count = itemCount();
   const menuRef = useRef<HTMLDivElement>(null);
+  const catalogRef = useRef<HTMLLIElement>(null);
 
-  // Cerrar dropdown al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false);
       }
+      if (
+        catalogRef.current &&
+        !catalogRef.current.contains(e.target as Node)
+      ) {
+        setCatalogOpen(false);
+      }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
     logout();
     setUserMenuOpen(false);
-    navigate('/');
+    navigate("/");
   };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-
-        {/* Logo */}
-        <Link to="/" className="font-serif text-2xl tracking-tight text-foreground">
+      <div className="relative flex items-center justify-between px-6 py-4 lg:px-8">
+        <Link
+          to="/"
+          className="font-serif text-2xl tracking-tight text-foreground z-10"
+        >
           URBN
         </Link>
 
-        {/* Center Nav Links — Desktop */}
-        <ul className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <li key={link.label}>
-              <Link
-                to={link.href}
-                className="text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <ul className="absolute left-1/2 -translate-x-1/2 hidden items-baseline gap-10 md:flex whitespace-nowrap">
+          <li>
+            <Link
+              to="/catalog?sort=new"
+              className="text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+            >
+              New Arrivals
+            </Link>
+          </li>
 
-        {/* Right Icons */}
-        <div className="flex items-center gap-5">
+          <li
+            ref={catalogRef}
+            className="relative"
+            onMouseEnter={() => setCatalogOpen(true)}
+            onMouseLeave={() => setCatalogOpen(false)}
+          >
+            <Link
+              to="/catalog"
+              className="flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Catalog
+              <ChevronDown
+                className={`h-3 w-3 transition-transform duration-200 ${catalogOpen ? "rotate-180" : ""}`}
+                strokeWidth={1.5}
+              />
+            </Link>
+
+            {catalogOpen && (
+              <div className="absolute left-0 top-full pt-3">
+                <div className="flex bg-background border border-border shadow-md">
+                  <div className="px-6 py-5 border-r border-border min-w-[160px]">
+                    <p className="text-xs font-medium uppercase tracking-widest text-foreground mb-4">
+                      By Gender
+                    </p>
+                    {GENDER_LINKS.map((link) => (
+                      <Link
+                        key={link.label}
+                        to={link.href}
+                        onClick={() => setCatalogOpen(false)}
+                        className="block py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="px-6 py-5 min-w-[160px]">
+                    <p className="text-xs font-medium uppercase tracking-widest text-foreground mb-4">
+                      By Category
+                    </p>
+                    {CATEGORY_LINKS.map((link) => (
+                      <Link
+                        key={link.label}
+                        to={link.href}
+                        onClick={() => setCatalogOpen(false)}
+                        className="block py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </li>
+
+          <li>
+            <Link
+              to="/about"
+              className="text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+            >
+              About
+            </Link>
+          </li>
+        </ul>
+        <div className="flex items-center gap-5 z-10">
           <button
             aria-label="Search"
             className="text-foreground transition-colors hover:text-muted-foreground"
@@ -68,22 +152,28 @@ export default function Navbar() {
             <Search className="h-[18px] w-[18px]" strokeWidth={1.5} />
           </button>
 
-          {/* User icon con dropdown */}
           <div ref={menuRef} className="relative hidden sm:block">
             <button
               aria-label="Account"
-              onClick={() => isAuthenticated ? setUserMenuOpen(!userMenuOpen) : navigate('/login')}
+              onClick={() =>
+                isAuthenticated
+                  ? setUserMenuOpen(!userMenuOpen)
+                  : navigate("/login")
+              }
               className="text-foreground transition-colors hover:text-muted-foreground"
             >
               <User className="h-[18px] w-[18px]" strokeWidth={1.5} />
             </button>
 
-            {/* Dropdown */}
             {isAuthenticated && userMenuOpen && (
               <div className="absolute right-0 top-8 w-48 bg-background border border-border shadow-sm">
                 <div className="border-b border-border px-4 py-3">
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Signed in as</p>
-                  <p className="mt-0.5 text-xs text-foreground truncate">{user?.email}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Signed in as
+                  </p>
+                  <p className="mt-0.5 text-xs text-foreground truncate">
+                    {user?.email}
+                  </p>
                 </div>
                 <ul className="py-1">
                   <li>
@@ -96,7 +186,7 @@ export default function Navbar() {
                       My Orders
                     </Link>
                   </li>
-                  {(user?.role === 'ADMIN' || user?.role === 'SELLER') && (
+                  {(user?.role === "ADMIN" || user?.role === "SELLER") && (
                     <li>
                       <Link
                         to="/admin/products"
@@ -121,7 +211,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Cart */}
           <button
             aria-label="Cart"
             onClick={toggleCart}
@@ -135,35 +224,61 @@ export default function Navbar() {
             )}
           </button>
 
-          {/* Mobile menu button */}
           <button
             aria-label="Toggle menu"
             className="text-foreground md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            {mobileOpen
-              ? <X className="h-5 w-5" strokeWidth={1.5} />
-              : <Menu className="h-5 w-5" strokeWidth={1.5} />
-            }
+            {mobileOpen ? (
+              <X className="h-5 w-5" strokeWidth={1.5} />
+            ) : (
+              <Menu className="h-5 w-5" strokeWidth={1.5} />
+            )}
           </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Mobile Menu */}
       {mobileOpen && (
         <div className="border-t border-border bg-background px-6 pb-6 md:hidden">
           <ul className="flex flex-col gap-4 pt-4">
-            {navLinks.map((link) => (
-              <li key={link.label}>
-                <Link
-                  to={link.href}
-                  className="text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            ¡
+            <li>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">
+                Catalog
+              </p>
+              <div className="flex gap-8 pl-3 border-l border-border">
+                <div className="flex flex-col gap-2">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-foreground mb-1">
+                    By Gender
+                  </p>
+                  {GENDER_LINKS.map((link) => (
+                    <Link
+                      key={link.label}
+                      to={link.href}
+                      className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-2">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-foreground mb-1">
+                    By Category
+                  </p>
+                  {CATEGORY_LINKS.map((link) => (
+                    <Link
+                      key={link.label}
+                      to={link.href}
+                      className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </li>
             <li className="border-t border-border pt-2">
               {isAuthenticated ? (
                 <div className="flex flex-col gap-3">
@@ -175,7 +290,10 @@ export default function Navbar() {
                     My Orders
                   </Link>
                   <button
-                    onClick={() => { handleLogout(); setMobileOpen(false); }}
+                    onClick={() => {
+                      handleLogout();
+                      setMobileOpen(false);
+                    }}
                     className="text-left text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
                   >
                     Sign Out
@@ -197,131 +315,3 @@ export default function Navbar() {
     </header>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

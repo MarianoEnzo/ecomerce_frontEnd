@@ -1,91 +1,112 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { formatPrice } from '../lib/utils';
-import type { Product } from '../types';
+import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { formatPrice } from "../lib/utils";
+import type { Product } from "../types";
 
 interface ProductCardProps {
   product: Product;
   index: number;
+  onQuickAdd?: (product: Product) => void;
 }
 
-export default function ProductCard({ product, index }: ProductCardProps) {
-  const [hoveredColor, setHoveredColor] = useState<number | null>(null);
+export default function ProductCard({
+  product,
+  index,
+  onQuickAdd,
+}: ProductCardProps) {
+  const [activeColorIndex, setActiveColorIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const colors = useMemo(() => {
     const seen = new Set<number>();
-    return product.variants.reduce<{ id: number; name: string; imageUrl: string | null }[]>(
-      (acc, v) => {
-        if (!seen.has(v.colorId)) {
-          seen.add(v.colorId);
-          acc.push({ id: v.colorId, name: v.color.name, imageUrl: v.imageUrl });
-        }
-        return acc;
-      },
-      []
-    );
+    return product.variants.reduce<
+      { id: number; name: string; imageUrl: string | null }[]
+    >((acc, v) => {
+      if (!seen.has(v.colorId)) {
+        seen.add(v.colorId);
+        acc.push({ id: v.colorId, name: v.color.name, imageUrl: v.imageUrl });
+      }
+      return acc;
+    }, []);
   }, [product]);
 
-  const activeImage = hoveredColor
-    ? colors.find(c => c.id === hoveredColor)?.imageUrl ?? product.variants[0]?.imageUrl
-    : product.variants[0]?.imageUrl;
+  const activeImage =
+    colors[activeColorIndex]?.imageUrl ?? product.variants[0]?.imageUrl;
 
   return (
-    <Link to={`/products/${product.id}`} className="group flex flex-col">
-      <span className="mb-2 text-[10px] text-muted-foreground tracking-widest">
-        {String(index).padStart(2, '0')}
-      </span>
+    <div
+      className={`group flex flex-col relative transition-all duration-300 ${isHovered ? "z-30" : "z-0"}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setActiveColorIndex(0);
+      }}
+    >
+      <Link
+        to={`/products/${product.id}`}
+        state={{ colorId: colors[activeColorIndex]?.id }}
+        className={`relative aspect-[3/4] overflow-hidden block transition-shadow duration-300 ${
+          isHovered ? "shadow-xl" : "shadow-none"
+        }`}
+        style={{ backgroundColor: "#F5F5F3" }}
+      >
+        <img
+          src={activeImage ?? ""}
+          alt={product.name}
+          className={`h-full w-full object-contain transition-transform duration-500 ease-in-out mix-blend-multiply ${
+            isHovered ? "scale-105" : "scale-100"
+          }`}
+          style={{ opacity: 0 }}
+          onLoad={(e) => (e.currentTarget.style.opacity = "1")}
+        />
+      </Link>
 
-      <div className="relative aspect-[3/4] overflow-hidden bg-card">
-        {activeImage ? (
-          <img
-            src={activeImage}
-            alt={product.name}
-            className="h-full w-full object-cover transition-opacity duration-500"
-            style={{ opacity: 0 }}
-            onLoad={(e) => (e.currentTarget.style.opacity = '1')}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-card">
-            <span className="text-xs text-muted-foreground">No image</span>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-3 flex flex-col gap-1">
-        <span className="text-sm text-foreground">{product.name}</span>
+      <div className="mt-3 flex flex-col gap-0.5">
+        <div className="flex items-start justify-between gap-2">
+          <Link
+            to={`/products/${product.id}`}
+            className="text-sm text-foreground hover:opacity-60 transition-opacity leading-snug"
+          >
+            {product.name}
+          </Link>
+          <span className="text-sm text-foreground shrink-0">
+            {formatPrice(product.price)}
+          </span>
+        </div>
         <span className="text-xs text-muted-foreground capitalize">
           {product.category.toLowerCase()}
-        </span>
-        <span className="mt-1 text-sm text-foreground">
-          {formatPrice(product.price)}
         </span>
 
         {colors.length > 1 && (
           <div className="mt-2 flex items-center gap-1.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            {colors.map((color) => (
-              <button
+            {colors.map((color, i) => (
+              <Link
                 key={color.id}
-                onMouseEnter={(e) => { e.preventDefault(); setHoveredColor(color.id); }}
-                onMouseLeave={(e) => { e.preventDefault(); setHoveredColor(null); }}
-                onClick={(e) => e.preventDefault()}
-                className={`h-10 w-10 overflow-hidden border-2 transition-all duration-200 ${
-                  hoveredColor === color.id ? 'border-foreground' : 'border-transparent'
+                to={`/products/${product.id}`}
+                state={{ colorId: color.id }}
+                className={`h-8 w-8 overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
+                  i === activeColorIndex
+                    ? "border-foreground"
+                    : "border-transparent hover:border-foreground/40"
                 }`}
                 title={color.name}
+                onMouseEnter={() => setActiveColorIndex(i)}
               >
                 {color.imageUrl ? (
-                  <img src={color.imageUrl} alt={color.name} className="h-full w-full object-cover" />
+                  <img
+                    src={color.imageUrl}
+                    alt={color.name}
+                    className="h-full w-full object-cover mix-blend-multiply"
+                    style={{ backgroundColor: "#F5F5F3" }}
+                  />
                 ) : (
                   <div className="h-full w-full bg-muted" />
                 )}
-              </button>
+              </Link>
             ))}
-            <span className="text-[10px] text-muted-foreground ml-1">
-              {colors.length} colors
-            </span>
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

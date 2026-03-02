@@ -1,29 +1,70 @@
+import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { Volume2, VolumeX } from "lucide-react";
+
+const VIDEO_URL =
+  "https://videos.pexels.com/video-files/3777382/3777382-uhd_2560_1440_25fps.mp4";
+
 export default function EditorialBanner() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !muted;
+      setMuted(!muted);
+    }
+  };
+
   return (
-    <section className="bg-background px-6 py-16 lg:px-8 lg:py-24">
-      <div className="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-2 lg:gap-16">
+    <section className="relative min-h-screen overflow-hidden bg-black">
+      <video
+        ref={videoRef}
+        src={VIDEO_URL}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover opacity-60"
+      />
 
-        {/* Left — Quote */}
-        <div className="flex flex-col gap-6">
-          <h2 className="font-serif text-4xl leading-[1.05] text-foreground sm:text-5xl lg:text-6xl">
-            QUALITY OVER EVERYTHING
-          </h2>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-            Every piece is crafted with premium materials and meticulous
-            attention to detail. Built to last, designed to transcend seasons.
-          </p>
-        </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
 
-        {/* Right — Image */}
-        <div className="relative aspect-[4/3] overflow-hidden lg:aspect-[3/2]">
-          <img
-            src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80"
-            alt="Editorial lifestyle"
-            className="h-full w-full object-cover"
-          />
-        </div>
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center lg:px-8">
+        <span className="mb-6 text-[10px] uppercase tracking-widest text-white/40">
+          SS 2025 · Limited Edition
+        </span>
 
+        <h2 className="font-serif text-5xl leading-[1.0] text-white sm:text-6xl lg:text-[80px]">
+          QUALITY OVER
+          <br />
+          <span className="italic">EVERYTHING</span>
+        </h2>
+
+        <p className="mt-6 max-w-sm text-sm leading-relaxed text-white/50">
+          Every piece crafted with premium materials and meticulous attention to
+          detail. Built to last, designed to transcend seasons.
+        </p>
+
+        <Link
+          to="/catalog"
+          className="mt-10 inline-flex items-center border border-white/30 px-8 py-3.5 text-xs uppercase tracking-widest text-white transition-all hover:bg-white hover:text-black"
+        >
+          Shop the Collection
+        </Link>
       </div>
+
+      <button
+        onClick={toggleMute}
+        className="absolute bottom-8 right-8 z-10 flex h-9 w-9 items-center justify-center border border-white/20 text-white/50 transition-colors hover:border-white/50 hover:text-white"
+        aria-label={muted ? "Unmute" : "Mute"}
+      >
+        {muted ? (
+          <VolumeX className="h-4 w-4" strokeWidth={1.5} />
+        ) : (
+          <Volume2 className="h-4 w-4" strokeWidth={1.5} />
+        )}
+      </button>
     </section>
   );
 }
