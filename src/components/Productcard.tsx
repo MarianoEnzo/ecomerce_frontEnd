@@ -10,12 +10,7 @@ interface ProductCardProps {
   activeSize?: string;
 }
 
-export default function ProductCard({
-  product,
-  index,
-  onQuickAdd,
-  activeSize,
-}: ProductCardProps) {
+export default function ProductCard({ product, activeSize }: ProductCardProps) {
   const colors = useMemo(() => {
     const seen = new Set<number>();
     return product.variants.reduce<
