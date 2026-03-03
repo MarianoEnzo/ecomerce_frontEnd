@@ -43,7 +43,6 @@ export default function CartPage() {
   const items = cart?.items ?? [];
   const total = cart?.total ?? "0";
 
-  // Cart vacío
   if (items.length === 0) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center pt-16">

@@ -1,13 +1,9 @@
-// ─── Enums ────────────────────────────────────────────────────────────────────
-
 export type Role = "ADMIN" | "SELLER" | "CUSTOMER";
 export type Gender = "MALE" | "FEMALE" | "UNISEX";
 export type Category = "TSHIRT" | "SWEATSHIRT" | "JACKET" | "PANTS" | "SHOES";
 export type Size = "XS" | "S" | "M" | "L" | "XL" | "XXL";
 export type CartStatus = "ACTIVE" | "CHECKED_OUT";
 export type OrderStatus = "PENDING" | "PAID" | "CANCELLED";
-
-// ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export interface User {
   id: number;
@@ -19,8 +15,6 @@ export interface User {
 export interface AuthResponse {
   access_token: string;
 }
-
-// ─── Products ─────────────────────────────────────────────────────────────────
 
 export interface Color {
   id: number;
@@ -43,7 +37,7 @@ export interface Product {
   name: string;
   slug: string;
   description: string | null;
-  price: string; // Prisma Decimal viene como string en JSON
+  price: string;
   category: Category;
   gender: Gender;
   isActive: boolean;
@@ -63,8 +57,6 @@ export interface PaginatedProducts {
   };
 }
 
-// ─── Filters ──────────────────────────────────────────────────────────────────
-
 export interface ProductFilters {
   category?: Category;
   gender?: Gender;
@@ -78,8 +70,6 @@ export interface ProductFilters {
   order?: "asc" | "desc";
   search?: string;
 }
-
-// ─── Cart ─────────────────────────────────────────────────────────────────────
 
 export interface CartItem {
   id: number;
@@ -101,8 +91,6 @@ export interface Cart {
   createdAt: string;
   updatedAt: string;
 }
-
-// ─── Orders ───────────────────────────────────────────────────────────────────
 
 export interface OrderItem {
   id: number;
@@ -126,8 +114,6 @@ export interface Order {
   createdAt: string;
   items: OrderItem[];
 }
-
-// ─── Forms ────────────────────────────────────────────────────────────────────
 
 export interface LoginForm {
   email: string;

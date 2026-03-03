@@ -8,7 +8,6 @@ import { formatPrice } from "../lib/utils";
 export default function CartDrawer() {
   const { cart, isOpen, closeCart, setCart } = useCartStore();
 
-  // Cargar el carrito al montar
   useEffect(() => {
     cartApi
       .getCart()
@@ -16,7 +15,6 @@ export default function CartDrawer() {
       .catch(() => {});
   }, []);
 
-  // Bloquear scroll del body cuando está abierto
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
