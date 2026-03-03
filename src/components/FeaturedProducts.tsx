@@ -1,52 +1,85 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { productsApi } from "../features/auth/products/product.api";
 import QuickAddModal from "./QuickAddModal";
 import { formatPrice } from "../lib/utils";
 import type { Product } from "../types";
 
-const LIFESTYLE_IMAGES = [
-  "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=600&q=80",
-  "https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=600&q=80",
-  "https://images.unsplash.com/photo-1485218126466-34e6392ec754?w=600&q=80",
-  "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?w=600&q=80",
-];
+const CARD_WIDTH = 320;
+const GAP = 24;
 
-export default function FeaturedProducts() {
+export default function FeaturedCarousel() {
   const [quickAdd, setQuickAdd] = useState<Product | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data } = useQuery({
-    queryKey: ["products", { limit: 4, page: 2 }],
-    queryFn: () => productsApi.getAll({ limit: 4, page: 2 }),
+    queryKey: ["products", { limit: 10, page: 1 }],
+    queryFn: () => productsApi.getAll({ limit: 10, page: 1 }),
   });
 
   const products = data?.data ?? [];
 
+  const scroll = (direction: "left" | "right") => {
+    if (!scrollRef.current) return;
+    const el = scrollRef.current;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    if (direction === "right" && el.scrollLeft >= maxScroll - 1) {
+      el.scrollTo({ left: 0, behavior: "smooth" });
+    } else {
+      el.scrollBy({
+        left: direction === "left" ? -(CARD_WIDTH + GAP) : CARD_WIDTH + GAP,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
-    <section className="bg-card px-6 lg:px-8 min-h-screen flex items-center">
-      <div className="mx-auto max-w-7xl w-full py-16">
-        <h2 className="mb-10 text-xs uppercase tracking-widest text-muted-foreground lg:mb-14">
-          New Arrivals
-        </h2>
+    <section className="bg-card px-6 lg:px-8 py-20">
+      <div className="mx-auto max-w-7xl w-full">
+        <div className="mb-10 flex items-end justify-between">
+          <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
+            Featured
+          </h2>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => scroll("left")}
+              aria-label="Scroll left"
+              className="flex h-9 w-9 items-center justify-center border border-border text-foreground transition-colors hover:bg-foreground hover:text-background"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              aria-label="Scroll right"
+              className="flex h-9 w-9 items-center justify-center border border-border text-foreground transition-colors hover:bg-foreground hover:text-background"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-2 gap-x-3 gap-y-8 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-10">
-          {products.map((product, index) => (
-            <div key={product.id} className="group flex flex-col">
-              <span className="mb-2 text-[10px] text-muted-foreground tracking-widest">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-
-              <div className="relative aspect-[3/4] overflow-hidden">
-                <Link to={`/products/${product.id}`}>
+        <div
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto scroll-smooth pb-4"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="group flex flex-shrink-0 flex-col"
+              style={{ width: CARD_WIDTH + "px" }}
+            >
+              <div
+                className="relative aspect-[3/4] overflow-hidden transition-shadow duration-300 group-hover:shadow-xl"
+                style={{ backgroundColor: "#FFFFFF" }}
+              >
+                <Link to={"products/" + product.id}>
                   <img
-                    src={
-                      LIFESTYLE_IMAGES[index] ??
-                      product.variants[0]?.imageUrl ??
-                      ""
-                    }
+                    src={product.variants[0]?.imageUrl ?? ""}
                     alt={product.name}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105 mix-blend-multiply"
                     style={{ opacity: 0 }}
                     onLoad={(e) => (e.currentTarget.style.opacity = "1")}
                   />
@@ -58,35 +91,26 @@ export default function FeaturedProducts() {
                   Quick Add
                 </button>
               </div>
-
-              <div className="mt-3 flex flex-col gap-1">
-                <Link
-                  to={`/products/${product.id}`}
-                  className="text-sm text-foreground hover:opacity-60 transition-opacity"
-                >
-                  {product.name}
-                </Link>
+              <div className="mt-4 flex flex-col gap-0.5">
+                <div className="flex items-start justify-between">
+                  <Link
+                    to={"products/" + product.id}
+                    className="text-sm text-foreground hover:opacity-60 transition-opacity"
+                  >
+                    {product.name}
+                  </Link>
+                  <span className="text-sm text-foreground">
+                    {formatPrice(product.price)}
+                  </span>
+                </div>
                 <span className="text-xs text-muted-foreground capitalize">
                   {product.category.toLowerCase()}
-                </span>
-                <span className="mt-1 text-sm text-foreground">
-                  {formatPrice(product.price)}
                 </span>
               </div>
             </div>
           ))}
         </div>
-
-        <div className="mt-12 text-center">
-          <Link
-            to="/catalog"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent border-b border-accent pb-0.5 transition-opacity hover:opacity-60"
-          >
-            View All
-          </Link>
-        </div>
       </div>
-
       {quickAdd && (
         <QuickAddModal product={quickAdd} onClose={() => setQuickAdd(null)} />
       )}

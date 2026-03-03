@@ -6,7 +6,9 @@ import { productsApi } from "../../features/auth/products/product.api";
 import { cartApi } from "../../features/cart/cart.api";
 import { useCartStore } from "../../store/cart.store";
 import { formatPrice } from "../../lib/utils";
-import type { ProductVariant } from "../../types";
+import type { ProductVariant, Size } from "../../types";
+
+const ALL_SIZES: Size[] = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const SIZE_GUIDE = [
   { us: "XS", uk: "6", chest: "32-34", waist: "24-26" },
@@ -93,6 +95,7 @@ export default function ProductDetailPage() {
 
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [hoveredSize, setHoveredSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
@@ -133,12 +136,16 @@ export default function ProductDetailPage() {
     }, []);
   }, [product]);
 
-  const availableSizes = useMemo(() => {
+  const variantsForColor = useMemo(() => {
     if (!product) return [];
     return product.variants.filter(
       (v) => !selectedColor || v.colorId === selectedColor,
     );
   }, [product, selectedColor]);
+
+  const availableSizesForColor = useMemo(() => {
+    return new Set(variantsForColor.map((v) => v.size));
+  }, [variantsForColor]);
 
   const selectedVariant = useMemo<ProductVariant | null>(() => {
     if (!product || !selectedSize) return null;
@@ -158,8 +165,7 @@ export default function ProductDetailPage() {
       );
       if (colorVariant?.imageUrl) return colorVariant.imageUrl;
     }
-    const firstWithImage = product?.variants.find((v) => v.imageUrl);
-    return firstWithImage?.imageUrl ?? null;
+    return product?.variants.find((v) => v.imageUrl)?.imageUrl ?? null;
   }, [product, selectedColor]);
 
   const handleAddToCart = async () => {
@@ -242,12 +248,12 @@ export default function ProductDetailPage() {
         </nav>
 
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="aspect-[3/4] overflow-hidden bg-card">
+          <div className="aspect-[3/4] overflow-hidden bg-white">
             {activeImage ? (
               <img
                 src={activeImage}
                 alt={product.name}
-                className="h-full w-full object-cover transition-opacity duration-700"
+                className="h-full w-full object-contain mix-blend-multiply transition-opacity duration-700"
                 style={{ opacity: 0 }}
                 onLoad={(e) => (e.currentTarget.style.opacity = "1")}
               />
@@ -333,29 +339,42 @@ export default function ProductDetailPage() {
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
-                {availableSizes.map((variant) => {
-                  const outOfStock = variant.stock === 0;
-                  const selected = selectedSize === variant.size;
+                {ALL_SIZES.map((size) => {
+                  const available = availableSizesForColor.has(size);
+                  const variant = variantsForColor.find((v) => v.size === size);
+                  const outOfStock = available && variant?.stock === 0;
+                  const selected = selectedSize === size;
+
                   return (
-                    <button
-                      key={variant.id}
-                      onClick={() => {
-                        if (!outOfStock) {
-                          setSelectedSize(variant.size);
-                          setError("");
-                        }
-                      }}
-                      disabled={outOfStock}
-                      className={`h-10 min-w-[48px] px-3 text-xs uppercase tracking-wider transition-colors ${
-                        selected
-                          ? "bg-foreground text-background"
-                          : outOfStock
-                            ? "border border-border text-muted-foreground/40 line-through cursor-not-allowed"
-                            : "border border-border text-foreground hover:bg-foreground hover:text-background"
-                      }`}
-                    >
-                      {variant.size}
-                    </button>
+                    <div key={size} className="relative group/size">
+                      <button
+                        onClick={() => {
+                          if (available && !outOfStock) {
+                            setSelectedSize(size);
+                            setError("");
+                          }
+                        }}
+                        onMouseEnter={() => setHoveredSize(size)}
+                        onMouseLeave={() => setHoveredSize(null)}
+                        disabled={!available || outOfStock}
+                        className={`h-10 min-w-[48px] px-3 text-xs uppercase tracking-wider transition-colors ${
+                          selected
+                            ? "bg-foreground text-background"
+                            : !available
+                              ? "border border-border text-muted-foreground/30 line-through cursor-not-allowed"
+                              : outOfStock
+                                ? "border border-border text-muted-foreground/40 line-through cursor-not-allowed"
+                                : "border border-border text-foreground hover:bg-foreground hover:text-background"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                      {!available && hoveredSize === size && (
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-foreground px-2 py-1 text-[10px] text-background z-10">
+                          Not available in this color
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
@@ -387,7 +406,6 @@ export default function ProductDetailPage() {
                     <Plus className="h-3 w-3" strokeWidth={1.5} />
                   </button>
                 </div>
-
                 {selectedVariant && (
                   <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
                     {selectedVariant.stock} available

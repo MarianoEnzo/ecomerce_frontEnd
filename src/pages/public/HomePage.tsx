@@ -3,7 +3,6 @@ import CategoriesSection from "../../components/CategoriesSection";
 import FeaturedProducts from "../../components/FeaturedProducts";
 import EditorialBanner from "../../components/EditorialBanner";
 import FeaturedCarousel from "../../components/FeaturedCarousel";
-import SourceBanner from "../../components/sourceBanner";
 
 export default function HomePage() {
   return (
@@ -12,9 +11,11 @@ export default function HomePage() {
       <FeaturedCarousel />
       <EditorialBanner />
       <CategoriesSection />
-      <FeaturedProducts />
-
-      <SourceBanner />
+      <div className="border-t border-border py-16 flex items-center justify-center px-6">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+          URBN · SS 2025 · Minimalist Streetwear
+        </span>
+      </div>
     </>
   );
 }

@@ -7,16 +7,15 @@ interface ProductCardProps {
   product: Product;
   index: number;
   onQuickAdd?: (product: Product) => void;
+  activeSize?: string;
 }
 
 export default function ProductCard({
   product,
   index,
   onQuickAdd,
+  activeSize,
 }: ProductCardProps) {
-  const [activeColorIndex, setActiveColorIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-
   const colors = useMemo(() => {
     const seen = new Set<number>();
     return product.variants.reduce<
@@ -29,6 +28,25 @@ export default function ProductCard({
       return acc;
     }, []);
   }, [product]);
+
+  const [activeColorIndex, setActiveColorIndex] = useState(() => {
+    if (!product.variants?.length) return 0;
+
+    if (activeSize) {
+      const indexWithSize = colors.findIndex((color) =>
+        product.variants.some(
+          (v) => v.colorId === color.id && v.size === activeSize,
+        ),
+      );
+      if (indexWithSize !== -1) return indexWithSize;
+    }
+
+    const uniqueColorIds = Array.from(
+      new Set(product.variants.map((v) => v.colorId)),
+    );
+    return Math.floor(Math.random() * uniqueColorIds.length);
+  });
+  const [isHovered, setIsHovered] = useState(false);
 
   const activeImage =
     colors[activeColorIndex]?.imageUrl ?? product.variants[0]?.imageUrl;

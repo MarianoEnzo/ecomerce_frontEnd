@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Volume2, VolumeX } from "lucide-react";
 
 const VIDEO_URL =
-  "https://media.istockphoto.com/id/1450642470/video/fitness-city-and-man-running-on-bridge-training-in-a-cardio-exercise-or-workout-for-a-sports.mp4?s=mp4-640x640-is&k=20&c=N6XYqvxVKmGXGYIvOGXTVpf_oPku7owT0DKRYjUgz8E=";
+  "https://res.cloudinary.com/dm8vhezlk/video/upload/v1772470485/4985551-hd_1920_1080_25fps.mp4";
 
 export default function EditorialBanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -25,30 +25,30 @@ export default function EditorialBanner() {
         loop
         muted
         playsInline
-        className="absolute inset-0 h-full w-full object-cover opacity-60"
+        className="absolute inset-0 h-full w-full object-cover opacity-50"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/50" />
 
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 text-center lg:px-8">
+      <div className="relative z-10 flex min-h-screen flex-col items-start justify-end px-6 pb-24 lg:px-16 xl:px-24">
         <span className="mb-6 text-[10px] uppercase tracking-widest text-white/40">
-          SS 2025 · Limited Edition
+          SS 2025 · Streetwear
         </span>
 
-        <h2 className="font-serif text-5xl leading-[1.0] text-white sm:text-6xl lg:text-[80px]">
-          QUALITY OVER
+        <h2 className="font-serif text-5xl leading-[0.95] text-white sm:text-6xl lg:text-[88px]">
+          WEAR IT.
           <br />
-          <span className="italic">EVERYTHING</span>
+          <span className="italic">MOVE IN IT.</span>
         </h2>
 
         <p className="mt-6 max-w-sm text-sm leading-relaxed text-white/50">
-          Every piece crafted with premium materials and meticulous attention to
-          detail. Built to last, designed to transcend seasons.
+          Designed for those who let the movement speak. Silence is the loudest
+          statement.
         </p>
 
         <Link
           to="/catalog"
-          className="mt-10 inline-flex items-center border border-white/30 px-8 py-3.5 text-xs uppercase tracking-widest text-white transition-all hover:bg-white hover:text-black"
+          className="mt-10 inline-flex items-center bg-accent px-8 py-3.5 text-xs uppercase tracking-widest text-white transition-all hover:opacity-75"
         >
           Shop the Collection
         </Link>

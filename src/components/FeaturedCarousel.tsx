@@ -1,131 +1,80 @@
-import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ArrowRight } from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
 import { productsApi } from "../features/auth/products/product.api";
-import QuickAddModal from "./QuickAddModal";
 import { formatPrice } from "../lib/utils";
-import type { Product } from "../types";
 
-const CARD_WIDTH = 320;
-const GAP = 24;
-const INTERVAL = 4000;
+const FEATURED_SLUGS = [
+  "unisex-hoodie-uj8e",
+  "windbreaker-399i",
+  "women-hoodie-2and",
+  "polo-classic-bzgm",
+];
 
 export default function FeaturedCarousel() {
-  const [quickAdd, setQuickAdd] = useState<Product | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
-
-  const { data } = useQuery({
-    queryKey: ["products", { limit: 10, page: 1 }],
-    queryFn: () => productsApi.getAll({ limit: 10, page: 1 }),
+  const results = useQueries({
+    queries: FEATURED_SLUGS.map((slug) => ({
+      queryKey: ["product", slug],
+      queryFn: () => productsApi.getBySlug(slug),
+    })),
   });
 
-  const products = data?.data ?? [];
-
-  const scroll = (direction: "left" | "right") => {
-    if (!scrollRef.current) return;
-    const el = scrollRef.current;
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    if (direction === "right" && el.scrollLeft >= maxScroll - 1) {
-      el.scrollTo({ left: 0, behavior: "smooth" });
-    } else {
-      el.scrollBy({
-        left: direction === "left" ? -(CARD_WIDTH + GAP) : CARD_WIDTH + GAP,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (paused) return;
-    const interval = setInterval(() => scroll("right"), INTERVAL);
-    return () => clearInterval(interval);
-  }, [paused]);
+  const products = results.map((r) => r.data).filter(Boolean);
 
   return (
-    <section className="bg-card min-h-screen flex items-center px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl w-full py-16">
-        <div className="mb-10 flex items-end justify-between lg:mb-14">
-          <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
-            Featured
+    <section className="px-6 lg:px-16 xl:px-24 py-20 mt-20 lg:py-28 bg-background border-t border-border">
+      <div className="flex items-end justify-between mb-14">
+        <div>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+            Just dropped
+          </p>
+          <h2 className="font-serif text-3xl md:text-4xl font-normal text-foreground">
+            New Arrivals
           </h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => scroll("left")}
-              aria-label="Scroll left"
-              className="flex h-9 w-9 items-center justify-center border border-border text-foreground transition-colors hover:bg-foreground hover:text-background"
-            >
-              <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              aria-label="Scroll right"
-              className="flex h-9 w-9 items-center justify-center border border-border text-foreground transition-colors hover:bg-foreground hover:text-background"
-            >
-              <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
-            </button>
-          </div>
         </div>
-
-        <div
-          ref={scrollRef}
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          className="flex gap-6 overflow-x-auto scroll-smooth pb-4"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        <Link
+          to="/catalog?sort=new"
+          className="group inline-flex items-center gap-2 text-xs uppercase tracking-wider text-accent hover:opacity-75 transition-opacity"
         >
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="group flex flex-shrink-0 flex-col"
-              style={{ width: `${CARD_WIDTH}px` }}
-            >
-              <div
-                className="relative aspect-[3/4] overflow-hidden transition-shadow duration-300 group-hover:shadow-xl"
-                style={{ backgroundColor: "#FFFFFF" }}
-              >
-                <Link to={`/products/${product.id}`}>
-                  <img
-                    src={product.variants[0]?.imageUrl ?? ""}
-                    alt={product.name}
-                    className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105 mix-blend-multiply"
-                    style={{ opacity: 0 }}
-                    onLoad={(e) => (e.currentTarget.style.opacity = "1")}
-                  />
-                </Link>
-                <button
-                  onClick={() => setQuickAdd(product)}
-                  className="absolute bottom-0 left-0 right-0 translate-y-full bg-accent py-3 text-center text-xs uppercase tracking-widest text-white transition-transform duration-300 group-hover:translate-y-0"
-                >
-                  Quick Add
-                </button>
-              </div>
-
-              <div className="mt-4 flex flex-col gap-0.5">
-                <div className="flex items-start justify-between">
-                  <Link
-                    to={`/products/${product.id}`}
-                    className="text-sm text-foreground hover:opacity-60 transition-opacity"
-                  >
-                    {product.name}
-                  </Link>
-                  <span className="text-sm text-foreground">
-                    {formatPrice(product.price)}
-                  </span>
-                </div>
-                <span className="text-xs text-muted-foreground capitalize">
-                  {product.category.toLowerCase()}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+          View All
+          <ArrowRight
+            className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
+            strokeWidth={1.5}
+          />
+        </Link>
       </div>
 
-      {quickAdd && (
-        <QuickAddModal product={quickAdd} onClose={() => setQuickAdd(null)} />
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {products.map((product) => (
+          <Link
+            key={product!.id}
+            to={`/products/${product!.id}`}
+            className="group cursor-pointer"
+          >
+            <div className="relative aspect-[4/4] bg-card overflow-hidden mb-4">
+              <img
+                src={product!.variants[0]?.imageUrl ?? ""}
+                alt={product!.name}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors duration-300" />
+            </div>
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-sm text-foreground group-hover:text-accent transition-colors">
+                  {product!.name}
+                </h3>
+                <p className="text-xs text-muted-foreground capitalize mt-0.5">
+                  {product!.category.toLowerCase()}
+                </p>
+              </div>
+              <p className="text-sm text-foreground">
+                {formatPrice(product!.price)}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }

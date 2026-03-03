@@ -37,6 +37,14 @@ export default function Navbar() {
   const count = itemCount();
   const menuRef = useRef<HTMLDivElement>(null);
   const catalogRef = useRef<HTMLLIElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.getBoundingClientRect().height);
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -61,7 +69,10 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+    <header
+      ref={headerRef}
+      className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md"
+    >
       <div className="relative flex items-center justify-between px-6 py-4 lg:px-8">
         <Link
           to="/"
@@ -98,37 +109,42 @@ export default function Navbar() {
             </Link>
 
             {catalogOpen && (
-              <div className="absolute left-0 top-full pt-3">
-                <div className="flex bg-background border border-border shadow-md">
-                  <div className="px-6 py-5 border-r border-border min-w-[160px]">
-                    <p className="text-xs font-medium uppercase tracking-widest text-foreground mb-4">
+              <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 z-50">
+                <div className="flex bg-background border border-border shadow-sm">
+                  <div className="px-6 py-5 border-r border-border">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-foreground mb-4">
                       By Gender
                     </p>
-                    {GENDER_LINKS.map((link) => (
-                      <Link
-                        key={link.label}
-                        to={link.href}
-                        onClick={() => setCatalogOpen(false)}
-                        className="block py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
+                    <div className="flex gap-8">
+                      {GENDER_LINKS.map((link) => (
+                        <Link
+                          key={link.label}
+                          to={link.href}
+                          onClick={() => setCatalogOpen(false)}
+                          className="text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <div className="px-6 py-5 min-w-[160px]">
-                    <p className="text-xs font-medium uppercase tracking-widest text-foreground mb-4">
+
+                  <div className="px-6 py-5">
+                    <p className="text-[10px] font-medium uppercase tracking-widest text-foreground mb-4">
                       By Category
                     </p>
-                    {CATEGORY_LINKS.map((link) => (
-                      <Link
-                        key={link.label}
-                        to={link.href}
-                        onClick={() => setCatalogOpen(false)}
-                        className="block py-1.5 text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
+                    <div className="flex gap-8">
+                      {CATEGORY_LINKS.map((link) => (
+                        <Link
+                          key={link.label}
+                          to={link.href}
+                          onClick={() => setCatalogOpen(false)}
+                          className="text-xs uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

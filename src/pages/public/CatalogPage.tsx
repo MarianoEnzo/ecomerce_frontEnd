@@ -325,6 +325,7 @@ export default function CatalogPage() {
                       product={product}
                       index={index + 1 + (filters.page! - 1) * filters.limit!}
                       onQuickAdd={setQuickAdd}
+                      activeSize={filters.size}
                     />
                   ))}
                 </div>

@@ -33,7 +33,6 @@ export default function LoginPage() {
     try {
       const { access_token } = await authApi.login(data.email, data.password);
       const user = await authApi.me(access_token);
-      console.log('user:', user); 
       setAuth(access_token, user);
 
       if (user.role === "ADMIN" || user.role === "SELLER") {

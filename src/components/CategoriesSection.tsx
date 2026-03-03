@@ -43,7 +43,7 @@ export default function CategoriesSection() {
       <h2 className="py-10 text-center text-xs uppercase tracking-widest text-muted-foreground">
         Shop by Category
       </h2>
-      <div className="grid grid-cols-2 gap-1" style={{ height: "100vh" }}>
+      <div className="grid grid-cols-2 gap-1" style={{ height: "90vh" }}>
         {CATEGORIES.map((category) => (
           <Link
             key={category.name}
