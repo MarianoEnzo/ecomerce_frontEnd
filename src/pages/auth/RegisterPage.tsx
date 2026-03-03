@@ -53,7 +53,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="mb-10">
           <Link to="/" className="font-serif text-2xl text-foreground">
-            URBN
+            URBAN CRAFT
           </Link>
           <h1 className="mt-6 text-xs uppercase tracking-widest text-muted-foreground">
             Create Account

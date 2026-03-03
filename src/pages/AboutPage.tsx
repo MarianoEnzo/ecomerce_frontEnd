@@ -30,12 +30,12 @@ export default function AboutPage() {
             Portfolio Project
           </span>
           <h1 className="font-serif text-4xl text-foreground lg:text-5xl">
-            About URBN
+            About URBAN CRAFT
           </h1>
           <p className="text-sm leading-relaxed text-muted-foreground max-w-xl">
-            URBN is a full-stack ecommerce project built to demonstrate modern
-            web development skills. It features a complete shopping experience
-            including product browsing, filtering, cart management,
+            URBAN CRAFT is a full-stack ecommerce project built to demonstrate
+            modern web development skills. It features a complete shopping
+            experience including product browsing, filtering, cart management,
             authentication, and order processing.
           </p>
           <p className="text-sm leading-relaxed text-muted-foreground max-w-xl">

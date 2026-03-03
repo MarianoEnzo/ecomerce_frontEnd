@@ -14,7 +14,7 @@ export default function SiteFooter() {
         <div className="grid gap-10 lg:grid-cols-4 lg:gap-8">
           <div className="flex flex-col gap-4 lg:col-span-2">
             <span className="font-serif text-2xl tracking-tight text-background">
-              URBN
+              URBAN CRAFT
             </span>
             <p className="max-w-xs text-sm leading-relaxed text-background/50">
               Minimalist streetwear for the modern individual. Elevated basics,
@@ -125,7 +125,7 @@ export default function SiteFooter() {
 
         <div className="mx-auto mt-12 border-t border-background/10 pt-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-background/30">
-            © 2026 URBN. All rights reserved.
+            © 2026 URBAN CRAFT. All rights reserved.
           </p>
           <p className="text-xs text-background/20">
             Full-stack ecommerce — NestJS · React · MySQL · Prisma

@@ -105,7 +105,7 @@ export default function Navbar() {
             to="/"
             className="font-serif text-xl tracking-tight text-foreground"
           >
-            URBN
+            URBAN CRAFT
           </Link>
 
           <div className="hidden md:flex items-center gap-10">

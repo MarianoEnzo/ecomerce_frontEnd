@@ -12,7 +12,7 @@ export default function HomePage() {
       <CategoriesSection />
       <div className="border-t border-border py-16 flex items-center justify-center px-6">
         <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-          URBN · SS 2025 · Minimalist Streetwear
+          URBAN CRAFT · SS 2026 · Minimalist Streetwear
         </span>
       </div>
     </>
