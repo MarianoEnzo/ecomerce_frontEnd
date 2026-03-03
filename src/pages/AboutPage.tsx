@@ -9,14 +9,12 @@ const GithubIcon = () => (
 );
 
 const TAGS = [
-  "Full Stack",
-  "E-Commerce",
   "React",
   "NestJS",
   "TypeScript",
   "MySQL",
   "Prisma",
-  "REST API",
+  "Docker",
   "JWT Auth",
   "Tailwind CSS",
   "TanStack Query",

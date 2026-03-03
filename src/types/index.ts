@@ -1,11 +1,11 @@
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
-export type Role = 'ADMIN' | 'SELLER' | 'CUSTOMER';
-export type Gender = 'MALE' | 'FEMALE' | 'UNISEX';
-export type Category = 'TSHIRT' | 'SWEATSHIRT' | 'JACKET' | 'PANTS' | 'SHOES';
-export type Size = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
-export type CartStatus = 'ACTIVE' | 'CHECKED_OUT';
-export type OrderStatus = 'PENDING' | 'PAID' | 'CANCELLED';
+export type Role = "ADMIN" | "SELLER" | "CUSTOMER";
+export type Gender = "MALE" | "FEMALE" | "UNISEX";
+export type Category = "TSHIRT" | "SWEATSHIRT" | "JACKET" | "PANTS" | "SHOES";
+export type Size = "XS" | "S" | "M" | "L" | "XL" | "XXL";
+export type CartStatus = "ACTIVE" | "CHECKED_OUT";
+export type OrderStatus = "PENDING" | "PAID" | "CANCELLED";
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
@@ -75,7 +75,8 @@ export interface ProductFilters {
   page?: number;
   limit?: number;
   sort?: string;
-  order?: 'asc' | 'desc';
+  order?: "asc" | "desc";
+  search?: string;
 }
 
 // ─── Cart ─────────────────────────────────────────────────────────────────────

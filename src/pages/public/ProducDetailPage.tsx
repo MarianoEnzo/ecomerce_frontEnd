@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useLayoutEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Minus, Plus, X } from "lucide-react";
+import { ArrowLeft, Minus, Plus, X } from "lucide-react";
 import { productsApi } from "../../features/auth/products/product.api";
 import { cartApi } from "../../features/cart/cart.api";
 import { useCartStore } from "../../store/cart.store";
@@ -230,6 +230,14 @@ export default function ProductDetailPage() {
 
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
         <nav className="mb-8 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Back
+          </button>
+
           <button
             onClick={() => navigate("/")}
             className="hover:text-foreground transition-colors"
