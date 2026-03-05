@@ -5,10 +5,10 @@ import { productsApi } from "../features/auth/products/product.api";
 import { formatPrice } from "../lib/utils";
 
 const FEATURED_SLUGS = [
-  "unisex-hoodie-uj8e",
-  "windbreaker-399i",
-  "women-hoodie-2and",
-  "polo-classic-bzgm",
+  "unisex-hoodie-0vl0",
+  "windbreaker-7hnt",
+  "women-hoodie-nwz9",
+  "polo-classic-rt4e",
 ];
 
 export default function FeaturedCarousel() {
