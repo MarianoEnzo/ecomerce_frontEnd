@@ -6,6 +6,7 @@ import type {
 } from "../../../types";
 
 export const productsApi = {
+  
   getAll: async (filters: ProductFilters = {}): Promise<PaginatedProducts> => {
     const res = await api.get<PaginatedProducts>("/products", {
       params: filters,

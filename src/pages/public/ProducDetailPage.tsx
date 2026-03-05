@@ -169,27 +169,26 @@ export default function ProductDetailPage() {
   }, [product, selectedColor]);
 
   const handleAddToCart = async () => {
-    if (!selectedVariant) {
-      setError("Please select a size");
-      return;
-    }
-    if (selectedVariant.stock < quantity) {
-      setError(`Only ${selectedVariant.stock} units available`);
-      return;
-    }
-    setError("");
-    setAdding(true);
-    try {
-      await cartApi.addItem(selectedVariant.id, quantity);
-      const cart = await cartApi.getCart();
-      setCart(cart);
-      openCart();
-    } catch {
-      setError("Could not add to cart. Try again.");
-    } finally {
-      setAdding(false);
-    }
-  };
+  if (!selectedVariant) {
+    setError("Please select a size");
+    return;
+  }
+  if (selectedVariant.stock < quantity) {
+    setError(`Only ${selectedVariant.stock} units available`);
+    return;
+  }
+  setError("");
+  setAdding(true);
+  try {
+    const cart = await cartApi.addItem(selectedVariant.id, quantity);
+    setCart(cart);
+    openCart();
+  } catch {
+    setError("Could not add to cart. Try again.");
+  } finally {
+    setAdding(false);
+  }
+};
 
   if (isLoading) {
     return (

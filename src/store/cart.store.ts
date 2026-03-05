@@ -25,8 +25,8 @@ export const useCartStore = create<CartState>()((set, get) => ({
   toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
 
   itemCount: () => {
-    const cart = get().cart;
-    if (!cart) return 0;
-    return cart.items.reduce((acc, item) => acc + item.quantity, 0);
-  },
+  const cart = get().cart;
+  if (!cart || !cart.items) return 0;
+  return cart.items.reduce((acc, item) => acc + item.quantity, 0);
+},
 }));
